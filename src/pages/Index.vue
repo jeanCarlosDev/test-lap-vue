@@ -5,26 +5,29 @@
     <div class="justify-center row col-xl-12 col-lg-12 bg-color  " >
       <div class="m-5 ">
         <q-input
+          class="text-black"
           placeholder="First name "
           v-model="first_name"
-          inverted
-          color="white">
+          color="white"
+          inverted>
         </q-input>
       </div>
       <div class="m-5 ">
         <q-input
+          class="text-black"
           placeholder="Last name "
           v-model="last_name"
-          inverted
-          color="white">
+          color="white"
+          inverted>
         </q-input>
       </div>
       <div class="m-5">
         <q-input
+          class="text-black"
           placeholder="Participation"
           v-model="participation"
-          inverted
-          color="white">
+          color="white"
+          inverted>
         </q-input>
       </div>
       <q-btn
@@ -44,9 +47,9 @@
         <template slot="col-message" slot-scope="cell">
           <span class="light-paragraph">{{cell.data}}</span>
         </template>
-
       </q-table>
-        <div  >
+
+      <div style="margin-left: 30px;">
         <doughnutchart :labels="chartLabel" :dataDou="chartData"></doughnutchart>
       </div>
     </div>
@@ -59,7 +62,6 @@
 <script>
 import { QInput, QTable } from 'quasar'
 import Doughnutchart from './../components/Douhnutchart'
-import axios from './../plugins/axios'
 
 export default {
   name: 'PageIndex',
@@ -68,55 +70,55 @@ export default {
     last_name: '',
     participation: '',
     table: {},
-    chartData: [10,12],
+    chartData: [],
     chartLabel: [],
     config: {
-        title: 'Data Table',
-        refresh: true,
-        noHeader: false,
-        columnPicker: true,
-        leftStickyColumns: 0,
-        rightStickyColumns: 2,
-        bodyStyle: {
-          maxHeight: '500px'
-        },
-        rowHeight: '50px',
-        responsive: true,
-        pagination: {
-          rowsPerPage: 15,
-          options: [5, 10, 15, 30, 50, 500]
-        },
-        selection: 'multiple'
+      title: 'Data Table',
+      refresh: true,
+      noHeader: false,
+      columnPicker: true,
+      leftStickyColumns: 0,
+      rightStickyColumns: 2,
+      bodyStyle: {
+        maxHeight: '500px'
       },
+      rowHeight: '50px',
+      responsive: true,
+      pagination: {
+        rowsPerPage: 15,
+        options: [5, 10, 15, 30, 50, 500]
+      },
+      selection: 'multiple'
+    },
     columns: [
-       {
-          label: 'ID',
-          field: 'id',
-          width: '80px',
-          sort: true,
-          type: 'string'
-        },
-        {
-          label: 'First Name',
-          field: 'first_name',
-          width: '80px',
-          sort: true,
-          type: 'string'
-        },
-        {
-          label: 'Last Name',
-          field: 'last_name',
-          width: '80px',
-          sort: true,
-          type: 'string'
-        },
-        {
-          label: 'Participation',
-          field: 'participation',
-          width: '80px',
-          sort: true,
-          type: 'number'
-        }
+      {
+        label: 'ID',
+        field: 'id',
+        width: '80px',
+        sort: true,
+        type: 'string'
+      },
+      {
+        label: 'First Name',
+        field: 'first_name',
+        width: '80px',
+        sort: true,
+        type: 'string'
+      },
+      {
+        label: 'Last Name',
+        field: 'last_name',
+        width: '80px',
+        sort: true,
+        type: 'string'
+      },
+      {
+        label: 'Participation',
+        field: 'participation',
+        width: '80px',
+        sort: true,
+        type: 'number'
+      }
     ]
   }),
   components: {
@@ -125,38 +127,36 @@ export default {
     Doughnutchart
   },
   methods: {
-    submitPayload () {
-      let payLoad = {
-        "first_name": this.first_name,
-        "last_name": this.last_name,
-        "participation": this.participation
-      }
-      this.$axios.post('/employee/save',payLoad)
+    resetData () {
+      this.first_name = ''
+      this.last_name = ''
+      this.participation = ''
     },
-     findData(){
+    submitPayload () {
+      const firstName = 'first_name'
+      const lastName = 'last_name'
+      const participation = 'participation'
+      const payLoad = {
+        [firstName]: this.first_name,
+        [lastName]: this.last_name,
+        [participation]: this.participation
+      }
+      this.$axios.post('/employee/save', payLoad)
+        .then(this.findData)
+        .then(this.resetData)
+    },
+    findData () {
       this.$axios.get('http://localhost:3000/employee/getAll')
-      .then(response => {
-         this.table = response.data;
-
-          response.data.forEach(data => {
-          this.chartLabel.push(data.first_name + ' ' + data.last_name);
-          this.chartData.push(data.participation);
+        .then(({ data }) => {
+          this.table = data
+          this.chartLabel = data.map(el => `${el.first_name} ${el.last_name}`)
+          this.chartData = data.map(el => el.participation)
         })
-        });
-
     }
 
   },
-  computed: {
-
-  },
-
-  mounted: function() {
+  mounted () {
     this.findData()
-
-
-
-
   }
 }
 </script>
