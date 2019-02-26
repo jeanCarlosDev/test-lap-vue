@@ -1,51 +1,54 @@
+
 <template>
-  <div class="justify-center row col-xl-12 col-lg-12">
-    <div class="justify-center row col-xl-12 col-lg-12">
-      <div class="m-5">
+
+  <div class="justify-center row col-xl-12 col-lg-12 " >
+    <div class="justify-center row col-xl-12 col-lg-12 bg-color  " >
+      <div class="m-5 ">
         <q-input
-          stack-label="Stack label"
-          v-model="first_name">
+          placeholder="First name "
+          v-model="first_name"
+          inverted
+          color="white">
+        </q-input>
+      </div>
+      <div class="m-5 ">
+        <q-input
+          placeholder="Last name "
+          v-model="last_name"
+          inverted
+          color="white">
         </q-input>
       </div>
       <div class="m-5">
         <q-input
-          stack-label="Stack label dois"
-          v-model="last_name">
-        </q-input>
-      </div>
-      <div class="m-5">
-        <q-input
-          stack-label="Stack label tres"
-          v-model="participation">
+          placeholder="Participation"
+          v-model="participation"
+          inverted
+          color="white">
         </q-input>
       </div>
       <q-btn
-        class="btn-fixed-width"
+        class="btn-fixed-width m-5 "
         outline
         @click="submitPayload"
-        :color="primaryColor"
+        color="white"
         label="SEND"
-        size="md"/>
+        size="15px"
+        />
     </div>
-    <div class="justify-center row col-xl-12 col-lg-12">
-      <div>
-        <doughnutchart :labels="chartLabel" :data="chartData"></doughnutchart>
-      </div>
-      <q-table
+    <div class="justify-center row col-xl-12 col-lg-12 m-50">
+
+       <q-table
         :data="table"
-        :columns="columns"
-      >
+        :columns="columns">
         <template slot="col-message" slot-scope="cell">
           <span class="light-paragraph">{{cell.data}}</span>
         </template>
-        <template slot="col-source" slot-scope="cell">
-          <div v-if="cell.data === 'Audit'" class="my-label text-white bg-primary">
-            Audit
-            <q-tooltip>Some data</q-tooltip>
-          </div>
-          <div v-else class="my-label text-white bg-negative">{{cell.data}}</div>
-        </template>
+
       </q-table>
+        <div  >
+        <doughnutchart :labels="chartLabel" :dataDou="chartData"></doughnutchart>
+      </div>
     </div>
   </div>
 </template>
@@ -65,7 +68,7 @@ export default {
     last_name: '',
     participation: '',
     table: {},
-    chartData: [85, 55, 45, 95, 65, 80, 20, 105, 10],
+    chartData: [10,12],
     chartLabel: [],
     config: {
         title: 'Data Table',
@@ -124,51 +127,33 @@ export default {
   methods: {
     submitPayload () {
       let payLoad = {
-        first_name: this.first_name,
-        last_name: this.last_name,
-        participation: this.participation
+        "first_name": this.first_name,
+        "last_name": this.last_name,
+        "participation": this.participation
       }
-      this.$axios.post('http://localhost:3000/employee/save',payLoad)
+      this.$axios.post('/employee/save',payLoad)
     },
+     findData(){
+      this.$axios.get('http://localhost:3000/employee/getAll')
+      .then(response => {
+         this.table = response.data;
 
-    getRandomInt () {
-      return Math.floor(Math.random() * (50 - 5 + 1)) + 5
+          response.data.forEach(data => {
+          this.chartLabel.push(data.first_name + ' ' + data.last_name);
+          this.chartData.push(data.participation);
+        })
+        });
+
     }
+
   },
   computed: {
-    primaryColor () {
-      return 'primary'
-      // return this.firstInput + this.secondInput
-    },
-    emitEvent () {
-      console.log('first input mudou')
-      this.$emit('input mudou', this.firstInput)
-      return this.firstInput
-    }
+
   },
+
   mounted: function() {
+    this.findData()
 
-
-    this.$nextTick(function() {
-    this.chartData = [85, 55, 45, 95, 65, 80, 20, 105, 10]
-
-    console.log("ENTROU PORRA");
-      const employees = this.$axios.get('http://localhost:3000/employee/getAll')
-      .then(response => {
-        console.log(response.data)
-        this.table = response.data;
-
-        // response.data.forEach(data => {
-        //   console.log(data.first_name)
-        //   this.chartLabel.push(data.first_name + ' ' + data.last_name);
-        //   this.chartData.push(data.participation);
-        // })
-
-        console.log(this.chartData)
-
-
-      })
-    })
 
 
 
@@ -178,10 +163,22 @@ export default {
 
 <style>
 .m-5 {
-  margin: 5px;
+  margin: 10px;
 }
+.m-50 {
+  margin: 50px;
+}
+
 .btn-fixed-width {
   width: 150px;
-  height: 60px;
+  height: 38px;
 }
+.bg-color{
+   background-color: #01b8e2;
+}
+
+.fixed-height {
+  height: 100px;
+}
+
 </style>
